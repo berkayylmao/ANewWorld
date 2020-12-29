@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Helpers\Dear ImGui\Implementations">
+      <UniqueIdentifier>{9964ad7d-77af-4495-9326-e8870e1edcbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Dear ImGui">
+      <UniqueIdentifier>{e3931d3a-4922-465e-be9c-3d8dd243ba3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{457e0028-9bc6-4c74-929f-a1780d7ebd7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\fmt">
+      <UniqueIdentifier>{8e650801-2b39-4de6-959e-c721b56dc767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Dear ImGui\Fonts">
+      <UniqueIdentifier>{e4ec539e-760a-4c03-82e4-7963ac93383d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Dear ImGui\Images">
+      <UniqueIdentifier>{4b36953c-c4a9-4d3d-9835-b503e23334c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_vsdefault">
+      <UniqueIdentifier>{b32407f8-f61d-47c4-856b-ce7624d75246}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Helpers\Dear ImGui\Implementations\imgui_impl_dx9.cpp">
+      <Filter>Helpers\Dear ImGui\Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\Implementations\imgui_impl_win32.cpp">
+      <Filter>Helpers\Dear ImGui\Implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\imgui.cpp">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\imgui_demo.cpp">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\imgui_draw.cpp">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\imgui_user.cpp">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\Dear ImGui\imgui_widgets.cpp">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Helpers\fmt\format.cc">
+      <Filter>Helpers\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="pch.cpp">
+      <Filter>_vsdefault</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Helpers\Dear ImGui\Fonts\FontAwesome-Solid.hpp">
+      <Filter>Helpers\Dear ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Fonts\OpenSans-Regular.hpp">
+      <Filter>Helpers\Dear ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Fonts\OpenSans-SemiBold.hpp">
+      <Filter>Helpers\Dear ImGui\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Images\LouImage.hpp">
+      <Filter>Helpers\Dear ImGui\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Images\WebsterImage.hpp">
+      <Filter>Helpers\Dear ImGui\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Implementations\imgui_impl_dx9.h">
+      <Filter>Helpers\Dear ImGui\Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\Implementations\imgui_impl_win32.h">
+      <Filter>Helpers\Dear ImGui\Implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imconfig.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imgui.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imgui_internal.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imgui_user.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imstb_rectpack.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imstb_textedit.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Dear ImGui\imstb_truetype.h">
+      <Filter>Helpers\Dear ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\fmt\core.h">
+      <Filter>Helpers\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\fmt\format.h">
+      <Filter>Helpers\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\fmt\format-inl.h">
+      <Filter>Helpers\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\fmt\ostream.h">
+      <Filter>Helpers\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\fmt\printf.h">
+      <Filter>Helpers\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Config.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Logger.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\Random.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Helpers\TwitchIRC.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>_vsdefault</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
