@@ -23,7 +23,7 @@
 
 // Win32 targeting
 #include <winsdkver.h>
-#define _WIN32_WINNT 0x0601  // _WIN32_WINNT_WIN7
+#define _WIN32_WINNT 0x0501  // _WIN32_WINNT_WINXP
 #include <sdkddkver.h>
 // Win32
 #define WIN32_LEAN_AND_MEAN

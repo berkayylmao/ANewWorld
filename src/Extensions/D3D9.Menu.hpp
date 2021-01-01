@@ -105,14 +105,10 @@ namespace Extensions::D3D9::Menu {
             const auto _sz = Config::Get()["NewLoadingScreens"]["LoadingTextResolution"].Get<std::string>();
             if (_sz._Equal("360p"))
               _resolutionIdx = 0;
-            else if (_sz._Equal("480p"))
-              _resolutionIdx = 1;
             else if (_sz._Equal("720p"))
-              _resolutionIdx = 2;
-            else if (_sz._Equal("1080p"))
-              _resolutionIdx = 3;
+              _resolutionIdx = 1;
             else
-              _resolutionIdx = 4;
+              _resolutionIdx = 2;
           }
 
           ImGui::AlignTextToFramePadding();
@@ -131,25 +127,17 @@ namespace Extensions::D3D9::Menu {
 
           ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 100.0f);
           ImGui::WithItemWidth _w(100.0f);
-          ImGui::Combo("###NewLoadingScreensLoadingTextResolution", &_resolutionIdx,
-                       " 360p\0 480p\0 720p\0 1080p\0 Custom");
-          if (ImGui::IsItemDeactivatedAfterEdit()) {
-            std::string _sz;
+          if (ImGui::Combo("###NewLoadingScreensLoadingTextResolution", &_resolutionIdx, " 360p\0 720p\0 Custom\0")) {
+            static std::string _sz;
             switch (_resolutionIdx) {
               default:
               case 0:
                 _sz = "360p";
                 break;
               case 1:
-                _sz = "480p";
-                break;
-              case 2:
                 _sz = "720p";
                 break;
-              case 3:
-                _sz = "1080p";
-                break;
-              case 4:
+              case 2:
                 _sz = "Custom";
                 break;
             }
