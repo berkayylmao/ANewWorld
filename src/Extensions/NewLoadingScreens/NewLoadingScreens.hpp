@@ -15,7 +15,7 @@
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see <https://www.gnu.org/licenses/>.
-// 
+//
 // clang-format on
 
 #pragma once
@@ -39,12 +39,12 @@ namespace Extensions::D3D9::NewLoadingScreens {
 
       static void __declspec(naked) hkLoadingScreen_LoadScreen() {
         __asm {
-            // mov[Extensions::InGameMenu::hasUserSeenFirstLoadingScreen], 1
+          // mov[Extensions::InGameMenu::hasUserSeenFirstLoadingScreen], 1
             mov[isShowingLoadingScreen], 1
             mov edx, [ecx]
             mov edx, [edx+0x5C]
             ret
-            }
+        }
       }
 
       static void __declspec(naked) hkLoadingScreen_UnloadScreen() {
@@ -56,9 +56,9 @@ namespace Extensions::D3D9::NewLoadingScreens {
             mov esp, ebp
             pop ebp
             retn 0x10
-            }
+        }
       }
-    } // namespace Hooks
+    }  // namespace Hooks
 
     struct LoadingTextSprite {
       std::filesystem::path           mPath;
@@ -120,11 +120,11 @@ namespace Extensions::D3D9::NewLoadingScreens {
 
           LPDIRECT3DTEXTURE9 _dummyTexture;
           if (FAILED(_result = D3DXCreateTextureFromFileExW(
-            pDevice, element.path().wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
-            D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
-            nullptr, nullptr, &_dummyTexture)))
+                         pDevice, element.path().wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
+                         D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
+                         nullptr, nullptr, &_dummyTexture)))
             Log(LogLevel::Error, fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t",
-                element.path().u8string(), _result));
+                                             element.path().u8string(), _result));
           else
             vTextures.push_back(_dummyTexture);
         }
@@ -138,11 +138,11 @@ namespace Extensions::D3D9::NewLoadingScreens {
           const auto _file = (loadingTextSprite.mPath / (std::to_string(i) + ".png"));
 
           if (FAILED(_result = D3DXCreateTextureFromFileExW(
-            pDevice, _file.wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
-            D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
-            nullptr, nullptr, &loadingTextSprite.mSprites[i])))
+                         pDevice, _file.wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
+                         D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
+                         nullptr, nullptr, &loadingTextSprite.mSprites[i])))
             Log(LogLevel::Error,
-              fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t", _file.u8string(), _result));
+                fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t", _file.u8string(), _result));
         }
       }
 
@@ -150,7 +150,7 @@ namespace Extensions::D3D9::NewLoadingScreens {
       alreadyCreatingTextures = false;
     }
 
-  } // namespace details
+  }  // namespace details
 
   static void Draw(IDirect3DDevice9* pDevice) {
     if (!Config::Get()["NewLoadingScreens"]["Enabled"].GetBool()) return;
@@ -159,17 +159,19 @@ namespace Extensions::D3D9::NewLoadingScreens {
       return;
     }
 
-    static const auto     _backgroundDuration = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
+    static const auto     _backgroundDuration    = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
     static auto           _backgroundSecondsLeft = _backgroundDuration;
-    static constexpr auto _backgroundTransitionDuration = 2.5f; // 2:30 seconds
+    static constexpr auto _backgroundTransitionDuration    = 2.5f;  // 2:30 seconds
     static auto           _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
-    static std::uint32_t  _currBackgroundImageIdx = 0;
-    static std::uint32_t  _nextBackgroundImageIdx = 0;
+    static std::uint32_t  _currBackgroundImageIdx          = 0;
+    static std::uint32_t  _nextBackgroundImageIdx          = 0;
 
     if (details::Hooks::resetTimers) {
       _backgroundSecondsLeft           = _backgroundDuration;
       _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
       _currBackgroundImageIdx          = _nextBackgroundImageIdx;
+
+      details::Hooks::resetTimers = false;
     }
 
     if (details::Hooks::isShowingLoadingScreen) {
@@ -204,7 +206,7 @@ namespace Extensions::D3D9::NewLoadingScreens {
 
         static const ImVec2 _loadingTextSizeActual = {static_cast<float>(details::loadingTextSprite.mWidth),
                                                       static_cast<float>(details::loadingTextSprite.mHeight)};
-        static const auto _loadingTextSizeRender =
+        static const auto   _loadingTextSizeRender =
             _loadingTextSizeActual / details::loadingTextSprite.mRenderSizeFactor;
         static const auto _loadingTextMaxFrame = details::loadingTextSprite.mFrames;
 
@@ -235,4 +237,4 @@ namespace Extensions::D3D9::NewLoadingScreens {
                                reinterpret_cast<std::uintptr_t>(&details::Hooks::hkLoadingScreen_UnloadScreen));
     }
   }
-} // namespace Extensions::D3D9::NewLoadingScreens
+}  // namespace Extensions::D3D9::NewLoadingScreens
