@@ -20,6 +20,7 @@
 
 #pragma once
 #include "pch.h"
+#include <future>
 
 #pragma warning(push, 0)
 // D3D9
@@ -100,6 +101,9 @@ namespace Extensions::D3D9::NewLoadingScreens {
       ~LoadingTextSprite() = default;
     };
 
+    static inline std::mutex createTexturesMutex;
+
+    static inline bool forceIgnoreFeature      = false;
     static inline bool alreadyCreatingTextures = false;
     static inline bool texturesCreated         = false;
 
@@ -107,6 +111,9 @@ namespace Extensions::D3D9::NewLoadingScreens {
     static inline std::vector<LPDIRECT3DTEXTURE9> vTextures;
 
     static void CreateTextures(LPDIRECT3DDEVICE9 pDevice) {
+      std::scoped_lock<std::mutex> _lock(createTexturesMutex);
+      if (alreadyCreatingTextures || texturesCreated) return;
+
       Log(LogLevel::Info, "Creating textures...");
       alreadyCreatingTextures = true;
 
@@ -119,10 +126,10 @@ namespace Extensions::D3D9::NewLoadingScreens {
           Log(LogLevel::Debug, fmt::format("Processing '{}'", element.path().u8string()));
 
           LPDIRECT3DTEXTURE9 _dummyTexture;
-          if (FAILED(_result = D3DXCreateTextureFromFileExW(
-                         pDevice, element.path().wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
-                         D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
-                         nullptr, nullptr, &_dummyTexture)))
+          if (FAILED(_result = D3DXCreateTextureFromFileExW(pDevice, element.path().wstring().c_str(),
+                                                            loadingTextSprite.mWidth, loadingTextSprite.mHeight, 1, 0,
+                                                            D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE,
+                                                            D3DX_DEFAULT, 0, nullptr, nullptr, &_dummyTexture)))
             Log(LogLevel::Error, fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t",
                                              element.path().u8string(), _result));
           else
@@ -135,12 +142,12 @@ namespace Extensions::D3D9::NewLoadingScreens {
         Log(LogLevel::Debug, fmt::format("Textures folder: {}", loadingTextSprite.mPath.u8string()));
 
         for (std::size_t i = 0; i < loadingTextSprite.mFrames; i++) {
-          const auto _file = (loadingTextSprite.mPath / (std::to_string(i) + ".png"));
+          const auto _file = loadingTextSprite.mPath / (std::to_string(i) + ".png");
 
-          if (FAILED(_result = D3DXCreateTextureFromFileExW(
-                         pDevice, _file.wstring().c_str(), loadingTextSprite.mWidth, loadingTextSprite.mHeight,
-                         D3DX_FROM_FILE, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
-                         nullptr, nullptr, &loadingTextSprite.mSprites[i])))
+          if (FAILED(_result = D3DXCreateTextureFromFileExW(pDevice, _file.wstring().c_str(), loadingTextSprite.mWidth,
+                                                            loadingTextSprite.mHeight, 1, 0, D3DFMT_UNKNOWN,
+                                                            D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
+                                                            nullptr, nullptr, &loadingTextSprite.mSprites[i])))
             Log(LogLevel::Error,
                 fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t", _file.u8string(), _result));
         }
@@ -150,16 +157,22 @@ namespace Extensions::D3D9::NewLoadingScreens {
       alreadyCreatingTextures = false;
     }
 
+    static LRESULT CALLBACK WndProc(HWND, UINT uMsg, WPARAM wParam, LPARAM) {
+      if (uMsg == WM_SYSKEYDOWN && wParam == 0x5A) forceIgnoreFeature = !forceIgnoreFeature;
+      return MirrorHook::WndProc::g_constIgnoreThisReturn;
+    }
   }  // namespace details
 
-  static void Draw(IDirect3DDevice9* pDevice) {
-    if (!Config::Get()["NewLoadingScreens"]["Enabled"].GetBool()) return;
+  static void Draw(LPDIRECT3DDEVICE9 pDevice) {
+    if (details::forceIgnoreFeature || !Config::Get()["NewLoadingScreens"]["Enabled"].GetBool()) return;
     if (!details::texturesCreated) {
-      if (!details::alreadyCreatingTextures) std::thread(details::CreateTextures, pDevice).detach();
+      if (!details::alreadyCreatingTextures)
+        auto _dummy = std::async(std::launch::async, details::CreateTextures, pDevice);
+
       return;
     }
 
-    static const auto     _backgroundDuration    = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
+    const auto            _backgroundDuration    = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
     static auto           _backgroundSecondsLeft = _backgroundDuration;
     static constexpr auto _backgroundTransitionDuration    = 2.5f;  // 2:30 seconds
     static auto           _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
@@ -229,12 +242,15 @@ namespace Extensions::D3D9::NewLoadingScreens {
   }
 
   static void Init() {
-    Log(LogLevel::Debug, "Installing hooks.");
+    Log(LogLevel::Debug, "Installing hooks...");
     {
       MemoryEditor::Get().Make(MemoryEditor::MakeType::Call, MemoryEditor::Get().AbsRVA(0x897A6),
                                reinterpret_cast<std::uintptr_t>(&details::Hooks::hkLoadingScreen_LoadScreen));
       MemoryEditor::Get().Make(MemoryEditor::MakeType::Jump, MemoryEditor::Get().AbsRVA(0x896FE),
                                reinterpret_cast<std::uintptr_t>(&details::Hooks::hkLoadingScreen_UnloadScreen));
     }
+
+    Log(LogLevel::Debug, "Adding MirrorHook (WndProc) extension...");
+    { MirrorHook::WndProc::AddExtension(&details::WndProc); }
   }
 }  // namespace Extensions::D3D9::NewLoadingScreens
