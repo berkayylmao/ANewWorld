@@ -55,13 +55,13 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;ANEWWORLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;RAPIDJSON_HAS_STDSTRING;_DEBUG;ANEWWORLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(SolutionDir)asio\asio\include;$(SolutionDir)MirrorHook\include;$(SolutionDir)OpenSpeed;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(SolutionDir)asio\asio\include;$(SolutionDir)MirrorHook\include;$(SolutionDir)OpenSpeed;$(SolutionDir);$(ProjectDir)src\_vs;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -71,7 +71,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;$(DXSDK_DIR)Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(NFS_WORLD)\scripts\$(TargetFileName)" /y</Command>
@@ -86,25 +86,29 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;ANEWWORLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;RAPIDJSON_HAS_STDSTRING;NDEBUG;ANEWWORLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(SolutionDir)asio\asio\include;$(SolutionDir)MirrorHook\include;$(SolutionDir)OpenSpeed;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(DXSDK_DIR)Include;$(SolutionDir)asio\asio\include;$(SolutionDir)MirrorHook\include;$(SolutionDir)OpenSpeed;$(SolutionDir);$(ProjectDir)src\_vs;$(ProjectDir)src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(ProjectDir)lib;$(DXSDK_DIR)Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d9.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(TargetPath)" "$(NFS_WORLD)\scripts\$(TargetFileName)" /y</Command>
@@ -114,42 +118,107 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Helpers\Config.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\Fonts\FontAwesome-Solid.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\Fonts\OpenSans-Regular.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\Fonts\OpenSans-SemiBold.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\Images\LouImage.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\Images\WebsterImage.hpp" />
-    <ClInclude Include="Helpers\Dear ImGui\imconfig.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imgui.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imgui_internal.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imgui_user.h" />
-    <ClInclude Include="Helpers\Dear ImGui\Implementations\imgui_impl_dx9.h" />
-    <ClInclude Include="Helpers\Dear ImGui\Implementations\imgui_impl_win32.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imstb_rectpack.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imstb_textedit.h" />
-    <ClInclude Include="Helpers\Dear ImGui\imstb_truetype.h" />
-    <ClInclude Include="Helpers\fmt\core.h" />
-    <ClInclude Include="Helpers\fmt\format-inl.h" />
-    <ClInclude Include="Helpers\fmt\format.h" />
-    <ClInclude Include="Helpers\fmt\ostream.h" />
-    <ClInclude Include="Helpers\fmt\printf.h" />
-    <ClInclude Include="Helpers\Logger.hpp" />
-    <ClInclude Include="Helpers\Random.hpp" />
-    <ClInclude Include="Helpers\TwitchIRC.hpp" />
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="src\Extensions\D3D9.Base.hpp" />
+    <ClInclude Include="src\Extensions\D3D9.Menu.hpp" />
+    <ClInclude Include="src\Extensions\NewLoadingScreens\NewLoadingScreens.hpp" />
+    <ClInclude Include="src\Helpers\Config.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Fonts\FontAwesome-Solid.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Fonts\OpenSans-Regular.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Fonts\OpenSans-SemiBold.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Images\LouImage.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Images\WebsterImage.hpp" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imconfig.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imgui.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imgui_internal.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imgui_user.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Implementations\imgui_impl_dx9.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\Implementations\imgui_impl_win32.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imstb_rectpack.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imstb_textedit.h" />
+    <ClInclude Include="src\Helpers\Dear ImGui\imstb_truetype.h" />
+    <ClInclude Include="src\Helpers\fmt\core.h" />
+    <ClInclude Include="src\Helpers\fmt\format-inl.h" />
+    <ClInclude Include="src\Helpers\fmt\format.h" />
+    <ClInclude Include="src\Helpers\fmt\ostream.h" />
+    <ClInclude Include="src\Helpers\fmt\printf.h" />
+    <ClInclude Include="src\Helpers\Logger.hpp" />
+    <ClInclude Include="src\Helpers\Random.hpp" />
+    <ClInclude Include="src\Main.hpp" />
+    <ClInclude Include="src\_vs\pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\imgui.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\imgui_demo.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\imgui_draw.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\imgui_user.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\Implementations\imgui_impl_dx9.cpp" />
-    <ClCompile Include="Helpers\Dear ImGui\Implementations\imgui_impl_win32.cpp" />
-    <ClCompile Include="Helpers\fmt\format.cc" />
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="src\_win32entry\dllmain.cpp" />
+    <ClCompile Include="src\Helpers\Dear ImGui\imgui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\imgui_demo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\imgui_draw.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\imgui_user.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\imgui_widgets.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\Implementations\imgui_impl_dx9.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)src\Helpers\Dear ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)src\Helpers\Dear ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\Dear ImGui\Implementations\imgui_impl_win32.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)src\Helpers\Dear ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)src\Helpers\Dear ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\Helpers\fmt\format.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatWarningAsError>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatWarningAsError>
+    </ClCompile>
+    <ClCompile Include="src\_vs\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
