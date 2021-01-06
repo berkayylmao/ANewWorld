@@ -15,7 +15,7 @@
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see <https://www.gnu.org/licenses/>.
-//
+// 
 // clang-format on
 
 #pragma once
@@ -32,6 +32,8 @@
 #include "Helpers/Dear ImGui/imgui_internal.h"  // math operators for ImVec2
 #pragma warning(pop)
 
+// ReSharper disable CppClangTidyClangDiagnosticOldStyleCast
+
 namespace Extensions::D3D9::NewLoadingScreens {
   namespace details {
     namespace Hooks {
@@ -40,12 +42,12 @@ namespace Extensions::D3D9::NewLoadingScreens {
 
       static void __declspec(naked) hkLoadingScreen_LoadScreen() {
         __asm {
-          // mov[Extensions::InGameMenu::hasUserSeenFirstLoadingScreen], 1
+            // mov[Extensions::InGameMenu::hasUserSeenFirstLoadingScreen], 1
             mov[isShowingLoadingScreen], 1
             mov edx, [ecx]
             mov edx, [edx+0x5C]
             ret
-        }
+            }
       }
 
       static void __declspec(naked) hkLoadingScreen_UnloadScreen() {
@@ -57,48 +59,158 @@ namespace Extensions::D3D9::NewLoadingScreens {
             mov esp, ebp
             pop ebp
             retn 0x10
-        }
+            }
       }
-    }  // namespace Hooks
+    } // namespace Hooks
 
-    struct LoadingTextSprite {
-      std::filesystem::path           mPath;
-      std::vector<LPDIRECT3DTEXTURE9> mSprites;
-      std::uint32_t                   mFrames{0};
-      std::uint32_t                   mWidth{0};
-      std::uint32_t                   mHeight{0};
-      float                           mRenderSizeFactor{4.0f};
+    struct Backgrounds {
+      class BackgroundInfo {
+        ImVec2 mFocalPoint;
+        ImVec2 mUV0, mUV1;
 
-      explicit LoadingTextSprite() {
-        this->mPath =
-            Config::Get().GetConfigFolderPath() / "NewLoadingScreens" /
-            fmt::format("LoadingText_{}", Config::Get()["NewLoadingScreens"]["LoadingTextResolution"].GetString());
-        const auto _spriteJson = this->mPath / "sprite.json";
+        public:
+          std::filesystem::path mPath;
+          LPDIRECT3DTEXTURE9    mTexture{nullptr};
+          ImVec2                mSize;
+
+          void Draw(const ImVec4& tintColour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)) const {
+            ImGui::Image(mTexture, ImGui::GetIO().DisplaySize, mUV0, mUV1, tintColour);
+          }
+
+          void CalculateImageUVs() {
+            const auto& _displaySize = ImGui::GetIO().DisplaySize;
+            if (_displaySize.x > mSize.x && _displaySize.y > mSize.y) {
+              mUV0 = {0.0f, 0.0f};
+              mUV1 = {1.0f, 1.0f};
+            } else {
+              const auto _displaySizeCenter = _displaySize / 2.0f;
+
+              auto _imgLeft   = mFocalPoint.x - _displaySizeCenter.x;
+              auto _imgTop    = mFocalPoint.y - _displaySizeCenter.y;
+              auto _imgRight  = mFocalPoint.x + _displaySizeCenter.x;
+              auto _imgBottom = mFocalPoint.y + _displaySizeCenter.y;
+
+              if (_imgLeft < 0.0f) {
+                _imgRight += -_imgLeft;
+                _imgLeft = 0.0f;
+              }
+              if (_imgTop < 0.0f) {
+                _imgBottom += -_imgTop;
+                _imgTop = 0.0f;
+              }
+
+              while (_imgLeft >= _displaySizeCenter.x && _imgTop >= _displaySizeCenter.y &&
+                     (_imgRight + _displaySizeCenter.x) <= mSize.x && (_imgBottom + _displaySizeCenter.y) <= mSize.y) {
+                _imgLeft -= _displaySizeCenter.x;
+                _imgTop -= _displaySizeCenter.y;
+                _imgRight += _displaySizeCenter.x;
+                _imgBottom += _displaySizeCenter.y;
+              }
+
+              mUV0 = {std::max(0.0f, _imgLeft / mSize.x), std::max(0.0f, _imgTop / mSize.y)};
+              mUV1 = {std::min(1.0f, _imgRight / mSize.x), std::min(1.0f, _imgBottom / mSize.y)};
+            }
+          }
+
+          explicit BackgroundInfo(const std::filesystem::path& path, const ImVec2& size, const ImVec2& focalPoint) {
+            this->mPath       = path;
+            this->mSize       = size;
+            this->mFocalPoint = focalPoint;
+          }
+      };
+
+      std::filesystem::path       mPath;
+      std::vector<BackgroundInfo> mBackgrounds;
+
+      explicit Backgrounds() {
+        this->mPath          = Config::Get().GetConfigFolderPath() / "NewLoadingScreens" / "Backgrounds";
+        const auto _infoJson = mPath / "info.json";
 
         try {
-          if (!std::filesystem::exists(_spriteJson)) {
-            ::MessageBoxA(nullptr, "Sprite files are missing (for 'LoadingText')!", "Error loading 'LoadingText'!",
+          if (!std::filesystem::exists(_infoJson)) {
+            ::MessageBoxA(nullptr, "'info.json' is missing (for 'Backgrounds')!", "Error loading 'Backgrounds'!",
                           MB_ICONERROR | MB_OK);
           } else {
             rapidjson::Document _doc;
 
-            std::ifstream             _ifs(_spriteJson, std::ios_base::binary);
+            std::ifstream             _ifs(_infoJson, std::ios_base::binary);
             rapidjson::IStreamWrapper _isw(_ifs);
             _doc.ParseStream(_isw);
 
-            this->mFrames           = _doc["Frames"].GetUint();
-            this->mWidth            = _doc["Width"].GetUint();
-            this->mHeight           = _doc["Height"].GetUint();
-            this->mRenderSizeFactor = _doc["RenderSizeFactor"].GetFloat();
+            for (const auto& _info : _doc["Backgrounds"].GetArray()) {
+              BackgroundInfo _bgInfo(
+                  mPath / _info["FileName"].GetString(),
+                  {static_cast<float>(_info["Width"].GetUint()), static_cast<float>(_info["Height"].GetUint())},
+                  {static_cast<float>(_info["FocalPointX"].GetUint()),
+                   static_cast<float>(_info["FocalPointY"].GetUint())});
 
-            this->mSprites.resize(this->mFrames);
+              this->mBackgrounds.push_back(_bgInfo);
+            }
           }
         } catch (const std::runtime_error& e) {
-          ::MessageBoxA(nullptr, e.what(), "Error loading sprite (for 'LoadingText')!", MB_ICONERROR | MB_OK);
+          ::MessageBoxA(nullptr, e.what(), "Error loading 'Backgrounds'!", MB_ICONERROR | MB_OK);
         }
       }
+    };
 
-      ~LoadingTextSprite() = default;
+    class LoadingTextSprite {
+      ImVec2 mPivot{1.0f, 1.0f}, mOffset{0.0f, 0.0f};
+
+      public:
+        std::filesystem::path           mPath;
+        std::vector<LPDIRECT3DTEXTURE9> mSprites;
+        std::uint32_t                   mTotalFrames{0}, mCurrentFrame{0};
+        ImVec2                          mSize;
+
+        void Draw() {
+          const auto& _displaySize          = ImGui::GetIO().DisplaySize;
+          static auto _loadingTextFrameStep = 0.0f;
+
+          _loadingTextFrameStep += static_cast<float>(mTotalFrames) / ImGui::GetIO().Framerate;
+          if (_loadingTextFrameStep >= 1.0f) {
+            mCurrentFrame++;
+            _loadingTextFrameStep = 0.0f;
+          }
+          if (mCurrentFrame == mTotalFrames) mCurrentFrame = 0;
+
+          ImGui::SetCursorPos(
+          {(_displaySize.x * mPivot.x) - (mSize.x - mOffset.x),
+           (_displaySize.y * mPivot.y) - (mSize.y - mOffset.y)});
+          ImGui::Image(mSprites[mCurrentFrame], mSize);
+        }
+
+        explicit LoadingTextSprite() {
+          this->mPath =
+              Config::Get().GetConfigFolderPath() / "NewLoadingScreens" /
+              fmt::format("LoadingText_{}", Config::Get()["NewLoadingScreens"]["LoadingTextResolution"].GetString());
+          const auto _spriteJson = mPath / "sprite.json";
+
+          try {
+            if (!std::filesystem::exists(_spriteJson)) {
+              ::MessageBoxA(nullptr, "Sprite files are missing (for 'LoadingText')!", "Error loading 'LoadingText'!",
+                            MB_ICONERROR | MB_OK);
+            } else {
+              rapidjson::Document _doc;
+
+              std::ifstream             _ifs(_spriteJson, std::ios_base::binary);
+              rapidjson::IStreamWrapper _isw(_ifs);
+              _doc.ParseStream(_isw);
+
+              this->mTotalFrames = _doc["Frames"].GetUint();
+              this->mSize        =
+                  ImVec2{static_cast<float>(_doc["Width"].GetUint()), static_cast<float>(_doc["Height"].GetUint())} *
+                  _doc["RenderSizeFactor"].GetFloat();
+              this->mPivot  = {_doc["PivotX"].GetFloat(), _doc["PivotY"].GetFloat()};
+              this->mOffset = {_doc["OffsetX"].GetFloat(), _doc["OffsetY"].GetFloat()};
+
+              this->mSprites.resize(mTotalFrames);
+            }
+          } catch (const std::runtime_error& e) {
+            ::MessageBoxA(nullptr, e.what(), "Error loading sprite (for 'LoadingText')!", MB_ICONERROR | MB_OK);
+          }
+        }
+
+        ~LoadingTextSprite() = default;
     };
 
     static inline std::mutex createTexturesMutex;
@@ -107,8 +219,8 @@ namespace Extensions::D3D9::NewLoadingScreens {
     static inline bool alreadyCreatingTextures = false;
     static inline bool texturesCreated         = false;
 
-    static inline LoadingTextSprite               loadingTextSprite;
-    static inline std::vector<LPDIRECT3DTEXTURE9> vTextures;
+    static inline Backgrounds       backgrounds;
+    static inline LoadingTextSprite loadingTextSprite;
 
     static void CreateTextures(LPDIRECT3DDEVICE9 pDevice) {
       std::scoped_lock<std::mutex> _lock(createTexturesMutex);
@@ -118,22 +230,23 @@ namespace Extensions::D3D9::NewLoadingScreens {
       alreadyCreatingTextures = true;
 
       HRESULT _result;
+
+      Log(LogLevel::Info, "Creating Backgrounds textures...");
       {
-        const auto _dir = Config::Get().GetConfigFolderPath() / "NewLoadingScreens" / "Backgrounds";
-        Log(LogLevel::Debug, fmt::format("Textures folder: {}", _dir.string()));
+        Log(LogLevel::Debug, fmt::format("Textures folder: {}", backgrounds.mPath.u8string()));
 
-        for (const auto& element : std::filesystem::directory_iterator(_dir)) {
-          Log(LogLevel::Debug, fmt::format("Processing '{}'", element.path().u8string()));
+        for (auto& background : backgrounds.mBackgrounds) {
+          Log(LogLevel::Debug, fmt::format("Processing '{}'", background.mPath.u8string()));
 
-          LPDIRECT3DTEXTURE9 _dummyTexture;
-          if (FAILED(_result = D3DXCreateTextureFromFileExW(pDevice, element.path().wstring().c_str(),
-                                                            loadingTextSprite.mWidth, loadingTextSprite.mHeight, 1, 0,
-                                                            D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE,
-                                                            D3DX_DEFAULT, 0, nullptr, nullptr, &_dummyTexture)))
+          if (FAILED(_result = D3DXCreateTextureFromFileExW(pDevice, background.mPath.wstring().c_str(),
+            static_cast<UINT>(background.mSize.x),
+            static_cast<UINT>(background.mSize.y), 1, 0, D3DFMT_UNKNOWN,
+            D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER,
+            D3DX_DEFAULT, 0, nullptr, nullptr, &background.mTexture)))
             Log(LogLevel::Error, fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t",
-                                             element.path().u8string(), _result));
+                background.mPath.u8string(), _result));
           else
-            vTextures.push_back(_dummyTexture);
+            background.CalculateImageUVs();
         }
       }
 
@@ -141,15 +254,16 @@ namespace Extensions::D3D9::NewLoadingScreens {
       {
         Log(LogLevel::Debug, fmt::format("Textures folder: {}", loadingTextSprite.mPath.u8string()));
 
-        for (std::size_t i = 0; i < loadingTextSprite.mFrames; i++) {
+        for (std::size_t i = 0; i < loadingTextSprite.mTotalFrames; i++) {
           const auto _file = loadingTextSprite.mPath / (std::to_string(i) + ".png");
 
-          if (FAILED(_result = D3DXCreateTextureFromFileExW(pDevice, _file.wstring().c_str(), loadingTextSprite.mWidth,
-                                                            loadingTextSprite.mHeight, 1, 0, D3DFMT_UNKNOWN,
-                                                            D3DPOOL_MANAGED, D3DX_FILTER_TRIANGLE, D3DX_DEFAULT, 0,
-                                                            nullptr, nullptr, &loadingTextSprite.mSprites[i])))
+          if (FAILED(_result = D3DXCreateTextureFromFileExW(
+            pDevice, _file.wstring().c_str(), static_cast<UINT>(loadingTextSprite.mSize.x),
+            static_cast<UINT>(loadingTextSprite.mSize.y), 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
+            D3DX_FILTER_TRIANGLE | D3DX_FILTER_DITHER, D3DX_DEFAULT, 0, nullptr, nullptr,
+            &loadingTextSprite.mSprites[i])))
             Log(LogLevel::Error,
-                fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t", _file.u8string(), _result));
+              fmt::format("Texture couldn't be created.\n\tResult:\n\tFile:{}\n\t", _file.u8string(), _result));
         }
       }
 
@@ -161,7 +275,7 @@ namespace Extensions::D3D9::NewLoadingScreens {
       if (uMsg == WM_SYSKEYDOWN && wParam == 0x5A) forceIgnoreFeature = !forceIgnoreFeature;
       return MirrorHook::WndProc::g_constIgnoreThisReturn;
     }
-  }  // namespace details
+  } // namespace details
 
   static void Draw(LPDIRECT3DDEVICE9 pDevice) {
     if (details::forceIgnoreFeature || !Config::Get()["NewLoadingScreens"]["Enabled"].GetBool()) return;
@@ -172,12 +286,12 @@ namespace Extensions::D3D9::NewLoadingScreens {
       return;
     }
 
-    const auto            _backgroundDuration    = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
+    const auto            _backgroundDuration = Config::Get()["NewLoadingScreens"]["BackgroundTimer"].GetFloat();
     static auto           _backgroundSecondsLeft = _backgroundDuration;
-    static constexpr auto _backgroundTransitionDuration    = 2.5f;  // 2:30 seconds
+    static constexpr auto _backgroundTransitionDuration = 2.5f; // 2:30 seconds
     static auto           _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
-    static std::uint32_t  _currBackgroundImageIdx          = 0;
-    static std::uint32_t  _nextBackgroundImageIdx          = 0;
+    static std::uint32_t  _currBackgroundImageIdx = 0;
+    static std::uint32_t  _nextBackgroundImageIdx = 0;
 
     if (details::Hooks::resetTimers) {
       _backgroundSecondsLeft           = _backgroundDuration;
@@ -187,7 +301,11 @@ namespace Extensions::D3D9::NewLoadingScreens {
       details::Hooks::resetTimers = false;
     }
 
+#ifdef _DEBUG
+    if constexpr (true) {
+#else
     if (details::Hooks::isShowingLoadingScreen) {
+#endif
       ImGui::WithItemColor _color(ImGuiCol_WindowBg, {0.0f, 0.0f, 0.0f, 1.0f});
       ImGui::WithItemStyle _style1(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
       ImGui::WithItemStyle _style2(ImGuiStyleVar_Alpha, 1.0f);
@@ -195,47 +313,37 @@ namespace Extensions::D3D9::NewLoadingScreens {
       ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always);
       ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize, ImGuiCond_Always);
       if (ImGui::Begin("###NewLoadingScreens", nullptr, ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDecoration)) {
-        ImGui::Image(details::vTextures[_currBackgroundImageIdx], ImGui::GetWindowSize(), {0.0f, 0.0f}, {1.0f, 1.0f},
-                     {1.0f, 1.0f, 1.0f, _backgroundTransitionSecondsLeft / _backgroundTransitionDuration});
+        // Background
+        {
+          details::backgrounds.mBackgrounds[_currBackgroundImageIdx].Draw(
+              {1.0f, 1.0f, 1.0f, _backgroundTransitionSecondsLeft / _backgroundTransitionDuration});
 
-        _backgroundSecondsLeft -= ImGui::GetIO().DeltaTime;
-        if (_backgroundSecondsLeft <= 0.0f && details::vTextures.size() > 1) {
-          while (_currBackgroundImageIdx == _nextBackgroundImageIdx)
-            _nextBackgroundImageIdx = Random::Get<std::uint32_t>(0, details::vTextures.size() - 1);
+          if (details::backgrounds.mBackgrounds.size() > 1) _backgroundSecondsLeft -= ImGui::GetIO().DeltaTime;
 
-          ImGui::SetCursorPos({0.0f, 0.0f});
-          ImGui::Image(
-              details::vTextures[_nextBackgroundImageIdx], ImGui::GetWindowSize(), {0.0f, 0.0f}, {1.0f, 1.0f},
-              {1.0f, 1.0f, 1.0f,
-               ((_backgroundTransitionDuration - _backgroundTransitionSecondsLeft) / _backgroundTransitionDuration)});
+          if (_backgroundSecondsLeft <= 0.0f) {
+            while (_currBackgroundImageIdx == _nextBackgroundImageIdx)
+              _nextBackgroundImageIdx = Random::Get<std::uint32_t>(0, details::backgrounds.mBackgrounds.size() - 1);
 
-          _backgroundTransitionSecondsLeft -= ImGui::GetIO().DeltaTime;
-          if (_backgroundTransitionSecondsLeft <= 0.0f) {
-            _currBackgroundImageIdx          = _nextBackgroundImageIdx;
-            _backgroundSecondsLeft           = _backgroundDuration;
-            _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
+            ImGui::SetCursorPos({0.0f, 0.0f});
+            details::backgrounds.mBackgrounds[_nextBackgroundImageIdx].Draw(
+            {1.0f,
+             1.0f,
+             1.0f,
+             (_backgroundTransitionDuration - _backgroundTransitionSecondsLeft) / _backgroundTransitionDuration});
+
+            _backgroundTransitionSecondsLeft -= ImGui::GetIO().DeltaTime;
+            if (_backgroundTransitionSecondsLeft <= 0.0f) {
+              _currBackgroundImageIdx          = _nextBackgroundImageIdx;
+              _backgroundSecondsLeft           = _backgroundDuration;
+              _backgroundTransitionSecondsLeft = _backgroundTransitionDuration;
+            }
           }
         }
 
-        static const ImVec2 _loadingTextSizeActual = {static_cast<float>(details::loadingTextSprite.mWidth),
-                                                      static_cast<float>(details::loadingTextSprite.mHeight)};
-        static const auto   _loadingTextSizeRender =
-            _loadingTextSizeActual / details::loadingTextSprite.mRenderSizeFactor;
-        static const auto _loadingTextMaxFrame = details::loadingTextSprite.mFrames;
-
-        static std::uint32_t _loadingTextFrame     = 0;
-        static auto          _loadingTextFrameStep = 0.0f;
-
-        _loadingTextFrameStep += _loadingTextMaxFrame / ImGui::GetIO().Framerate;
-        if (_loadingTextFrameStep >= 1.0f) {
-          _loadingTextFrame++;
-          _loadingTextFrameStep = 0.0f;
+        // LoadingText
+        {
+          details::loadingTextSprite.Draw();
         }
-        if (_loadingTextFrame == _loadingTextMaxFrame) _loadingTextFrame = 0;
-
-        ImGui::SetCursorPos(
-            {ImGui::GetWindowWidth() - _loadingTextSizeRender.x, ImGui::GetWindowHeight() - _loadingTextSizeRender.y});
-        ImGui::Image(details::loadingTextSprite.mSprites[_loadingTextFrame], _loadingTextSizeRender);
       }
       ImGui::End();
     }
@@ -251,6 +359,8 @@ namespace Extensions::D3D9::NewLoadingScreens {
     }
 
     Log(LogLevel::Debug, "Adding MirrorHook (WndProc) extension...");
-    { MirrorHook::WndProc::AddExtension(&details::WndProc); }
+    {
+      MirrorHook::WndProc::AddExtension(&details::WndProc);
+    }
   }
-}  // namespace Extensions::D3D9::NewLoadingScreens
+} // namespace Extensions::D3D9::NewLoadingScreens

@@ -15,7 +15,7 @@
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see <https://www.gnu.org/licenses/>.
-//
+// 
 // clang-format on
 
 #pragma once
@@ -56,7 +56,7 @@ namespace Extensions::D3D9 {
       ImGui_ImplWin32_NewFrame();
       ImGui::NewFrame([]() { ImGui::Begin("Debug###Main", &isMainMenuVisible, ImGuiWindowFlags_AlwaysAutoResize); });
 
-      ImGui::GetIO().FontGlobalScale = std::max(0.9f, ImGui::GetIO().DisplaySize.y / 1080.0f);  // 1080p as base
+      ImGui::GetIO().FontGlobalScale = std::max(0.8f, ImGui::GetIO().DisplaySize.y / 1080.0f); // 1080p as base
     }
 
     static void __stdcall EndScene(IDirect3DDevice9* pDevice) {
@@ -101,7 +101,7 @@ namespace Extensions::D3D9 {
           }
         }
       } else {
-        const auto  _textSize    = ImGui::CalcTextSize(CONSTANT_szUITitleMain);
+        const auto  _textSize    = ImGui::CalcTextSize(CONSTANT_szUITitleMain) * 0.8f;
         const auto& _displaySize = ImGui::GetIO().DisplaySize;
 
         ImGui::WithItemStyle _style1(ImGuiStyleVar_FramePadding, {5.0f, 0.0f});
@@ -112,11 +112,13 @@ namespace Extensions::D3D9 {
                                 ImGuiCond_Always);
         if (ImGui::Begin("###MainMenuToggle", nullptr,
                          ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
+                         ImGuiWindowFlags_AlwaysAutoResize)) {
+          ImGui::SetWindowFontScale(0.8f);
+
           ImGui::WithItemColor _color1(ImGuiCol_Button,
                                        ImGui::GetStyleColorVec4(ImGuiCol_Button) - ImVec4(0.0f, 0.0f, 0.0f, 0.7f));
           ImGui::WithItemColor _color2(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered) -
-                                                                   ImVec4(0.0f, 0.0f, 0.0f, 0.7f));
+                                                               ImVec4(0.0f, 0.0f, 0.0f, 0.7f));
           ImGui::WithItemColor _color3(
               ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive) - ImVec4(0.0f, 0.0f, 0.0f, 0.7f));
           ImGui::WithItemColor _color4(ImGuiCol_Text,
@@ -138,7 +140,7 @@ namespace Extensions::D3D9 {
       if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) return TRUE;
       return MirrorHook::WndProc::g_constIgnoreThisReturn;
     }
-  }  // namespace details
+  } // namespace details
 
   static void Init() {
     IDirect3DDevice9* _pD3D9Dev = nullptr;
@@ -182,6 +184,8 @@ namespace Extensions::D3D9 {
     }
 
     Log(LogLevel::Info, "Initializing features...");
-    { NewLoadingScreens::Init(); }
+    {
+      NewLoadingScreens::Init();
+    }
   }
-}  // namespace Extensions::D3D9
+} // namespace Extensions::D3D9

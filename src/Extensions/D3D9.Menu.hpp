@@ -42,7 +42,7 @@ namespace Extensions::D3D9::Menu {
     static constexpr char CONFIG_szNewLoadingScreensLoadingTextResolution[]  = "Loading text resolution";
 
     // Tab Content
-    static void DrawConfigTabContent() {
+    static void DrawNewLoadingScreensConfigTabContent() {
       if (ImGui::BeginChild("###NewLoadingScreensConfigChild", {0.0f, 0.0f}, false, ImGuiWindowFlags_NoScrollbar)) {
         static auto& _newLoadingScreensConfig = Config::Get()["NewLoadingScreens"];
 
@@ -51,24 +51,13 @@ namespace Extensions::D3D9::Menu {
           ImGui::AlignTextToFramePadding();
           ImGui::TextUnformatted(CONFIG_szNewLoadingScreensEnabled);
           ImGui::SameLine();
-
-          // Display information marker
-          ImGui::TextDisabled("[?]");
-          if (ImGui::IsItemHovered()) {
-            ImGui::BeginTooltip();
-            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
-            ImGui::TextUnformatted("Whether ANewWorld should show new loading screens.");
-            ImGui::PopTextWrapPos();
-            ImGui::EndTooltip();
-          }
+          ImGui::InformationMarker("Whether ANewWorld should show new loading screens.");
 
           // Special bool handling
           static auto _enabled = _newLoadingScreensConfig["Enabled"].GetBool();
 
-          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - (ImGui::GetStyle().WindowPadding.x * 2.0f) -
-                          ImGui::GetStyle().FramePadding.x);
-          ImGui::Checkbox("###NewLoadingScreensEnabledCheckbox", &_enabled);
-          if (ImGui::IsItemDeactivatedAfterEdit()) {
+          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::GetStyle().WindowPadding.x * 2.0f);
+          if (ImGui::Checkbox("###NewLoadingScreensEnabledCheckbox", &_enabled)) {
             _newLoadingScreensConfig["Enabled"].SetBool(_enabled);
             Config::Get().Save();
           }
@@ -79,21 +68,13 @@ namespace Extensions::D3D9::Menu {
           ImGui::AlignTextToFramePadding();
           ImGui::TextUnformatted(CONFIG_szNewLoadingScreensNextBackgroundDuration);
           ImGui::SameLine();
-
-          // Display information marker
-          ImGui::TextDisabled("[?]");
-          if (ImGui::IsItemHovered()) {
-            ImGui::BeginTooltip();
-            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
-            ImGui::TextUnformatted("How often ANewWorld will switch to a different background.");
-            ImGui::PopTextWrapPos();
-            ImGui::EndTooltip();
-          }
+          ImGui::InformationMarker("How often ANewWorld will switch to a different background.");
 
           ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 100.0f);
           ImGui::WithItemWidth _w(100.0f);
-          ImGui::InputScalar("###NewLoadingScreensBackgroundTimer", ImGuiDataType_Double,
-                             reinterpret_cast<double*>(&_newLoadingScreensConfig["BackgroundTimer"]));
+          ImGui::InputScalar("###NewLoadingScreensBackgroundTimer", ImGuiDataType_Float,
+                             reinterpret_cast<float*>(&_newLoadingScreensConfig["BackgroundTimer"]), nullptr, nullptr,
+                             "%.2f");
           if (ImGui::IsItemDeactivatedAfterEdit()) Config::Get().Save();
         }
 
@@ -114,16 +95,7 @@ namespace Extensions::D3D9::Menu {
           ImGui::AlignTextToFramePadding();
           ImGui::TextUnformatted(CONFIG_szNewLoadingScreensLoadingTextResolution);
           ImGui::SameLine();
-
-          // Display information marker
-          ImGui::TextDisabled("[?]");
-          if (ImGui::IsItemHovered()) {
-            ImGui::BeginTooltip();
-            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
-            ImGui::TextUnformatted("The resolution will be changed in the next launch.");
-            ImGui::PopTextWrapPos();
-            ImGui::EndTooltip();
-          }
+          ImGui::InformationMarker("The resolution will be changed in the next launch.");
 
           ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 100.0f);
           ImGui::WithItemWidth _w(100.0f);
@@ -180,8 +152,8 @@ namespace Extensions::D3D9::Menu {
         ImGui::Separator();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 30.0f);
         ImGui::TextUnformatted(
-            "Making and maintaining a mod like this requires a lot of time and energy. If you enjoyed this mod, please "
-            "consider donating!");
+            "Making and maintaining a mod like this requires a lot of\ntime and energy. If you enjoyed this mod, "
+            "please consider donating!");
         ImGui::PopTextWrapPos();
         if (ImGui::SmallButton("PayPal"))
           ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkPayPal, nullptr, nullptr, SW_SHOW);
@@ -213,7 +185,7 @@ namespace Extensions::D3D9::Menu {
   static void DrawConfig() {
     if (ImGui::BeginTabBar("###ConfigTabBar", ImGuiTabBarFlags_FittingPolicyResizeDown)) {
       if (ImGui::BeginTabItem(details::CONFIG_szNewLoadingScreensHeader)) {
-        details::DrawConfigTabContent();
+        details::DrawNewLoadingScreensConfigTabContent();
         ImGui::EndTabItem();
       }
       ImGui::EndTabBar();
