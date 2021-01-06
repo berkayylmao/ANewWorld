@@ -178,4 +178,15 @@ namespace ImGui {
 
     return _isTextChanged;
   }
+  IMGUI_API void InformationMarker(const char* text) {
+    ImGui::TextDisabled("[?]");
+
+    if (ImGui::IsItemHovered()) {
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 20.0f);
+      ImGui::TextUnformatted(text);
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
+  }
 }  // namespace ImGui

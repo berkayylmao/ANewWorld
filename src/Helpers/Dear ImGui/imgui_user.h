@@ -70,4 +70,5 @@ namespace ImGui {
   IMGUI_API auto InputTextWithHintAlways(const char* label, const char* hint, char* buf, std::size_t buf_size,
                                          ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr,
                                          void* user_data = nullptr) -> bool;
+  IMGUI_API void InformationMarker(const char* text);
 }  // namespace ImGui
