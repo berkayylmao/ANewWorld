@@ -155,6 +155,7 @@ namespace Extensions::D3D9::NewLoadingScreens {
 
     class LoadingTextSprite {
       ImVec2 mPivot{1.0f, 1.0f}, mOffset{0.0f, 0.0f};
+      float  mPauseAfterLoop = 0.0f;
 
       public:
         std::filesystem::path           mPath;
@@ -166,12 +167,16 @@ namespace Extensions::D3D9::NewLoadingScreens {
           const auto& _displaySize          = ImGui::GetIO().DisplaySize;
           static auto _loadingTextFrameStep = 0.0f;
 
-          _loadingTextFrameStep += static_cast<float>(mTotalFrames) / ImGui::GetIO().Framerate;
-          if (_loadingTextFrameStep >= 1.0f) {
-            mCurrentFrame++;
-            _loadingTextFrameStep = 0.0f;
+          if (mCurrentFrame < mTotalFrames - 1) {
+            _loadingTextFrameStep += static_cast<float>(mTotalFrames) / ImGui::GetIO().Framerate;
+            if (_loadingTextFrameStep >= 1.0f) {
+              mCurrentFrame++;
+              _loadingTextFrameStep = 0.0f;
+            }
+          } else {
+            _loadingTextFrameStep += ImGui::GetIO().DeltaTime;
+            if (_loadingTextFrameStep >= mPauseAfterLoop) mCurrentFrame = 0;
           }
-          if (mCurrentFrame == mTotalFrames) mCurrentFrame = 0;
 
           ImGui::SetCursorPos(
           {(_displaySize.x * mPivot.x) - (mSize.x - mOffset.x),
@@ -196,8 +201,9 @@ namespace Extensions::D3D9::NewLoadingScreens {
               rapidjson::IStreamWrapper _isw(_ifs);
               _doc.ParseStream(_isw);
 
-              this->mTotalFrames = _doc["Frames"].GetUint();
-              this->mSize        =
+              this->mTotalFrames    = _doc["Frames"].GetUint();
+              this->mPauseAfterLoop = _doc["PauseAfterLoop"].GetFloat();
+              this->mSize           =
                   ImVec2{static_cast<float>(_doc["Width"].GetUint()), static_cast<float>(_doc["Height"].GetUint())} *
                   _doc["RenderSizeFactor"].GetFloat();
               this->mPivot  = {_doc["PivotX"].GetFloat(), _doc["PivotY"].GetFloat()};
