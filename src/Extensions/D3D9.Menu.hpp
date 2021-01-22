@@ -15,7 +15,7 @@
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see <https://www.gnu.org/licenses/>.
-//
+// 
 // clang-format on
 
 #pragma once
@@ -152,8 +152,8 @@ namespace Extensions::D3D9::Menu {
         ImGui::Separator();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 30.0f);
         ImGui::TextUnformatted(
-            "Making and maintaining a mod like this requires a lot of\ntime and energy. If you enjoyed this mod, "
-            "please consider donating!");
+            "Making and maintaining a mod like this requires a lot of\n"
+            "time and energy. If you enjoyed this mod, please consider donating!");
         ImGui::PopTextWrapPos();
         if (ImGui::SmallButton("PayPal"))
           ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkPayPal, nullptr, nullptr, SW_SHOW);
@@ -179,7 +179,7 @@ namespace Extensions::D3D9::Menu {
     }
 #pragma endregion
 #pragma endregion
-  }  // namespace details
+  } // namespace details
 
   // Called when user has Configuration tab active
   static void DrawConfig() {
@@ -194,4 +194,4 @@ namespace Extensions::D3D9::Menu {
 
   // Called when user has About tab active
   static void DrawAbout() { details::DrawAboutTabContent(); }
-}  // namespace Extensions::D3D9::Menu
+} // namespace Extensions::D3D9::Menu
