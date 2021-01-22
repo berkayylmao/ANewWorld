@@ -56,7 +56,8 @@ namespace Extensions::D3D9::Menu {
           // Special bool handling
           static auto _enabled = _newLoadingScreensConfig["Enabled"].GetBool();
 
-          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::GetStyle().WindowPadding.x * 2.0f);
+          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::GetStyle().WindowPadding.x * 2.0f -
+                          ImGui::GetStyle().FramePadding.x / 2.0f);
           if (ImGui::Checkbox("###NewLoadingScreensEnabledCheckbox", &_enabled)) {
             _newLoadingScreensConfig["Enabled"].SetBool(_enabled);
             Config::Get().Save();
