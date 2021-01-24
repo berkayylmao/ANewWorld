@@ -22,7 +22,7 @@
 #include "pch.h"
 
 #pragma warning(push, 0)
-#include <shellapi.h>  // ShellExecute
+#include <shellapi.h> // ShellExecute
 
 // Dear ImGui
 #include "Helpers/Dear ImGui/imgui.h"
@@ -30,8 +30,8 @@
 
 namespace Extensions::D3D9::Menu {
   namespace details {
-#pragma region TABS
-#pragma region Config(TAB)
+    #pragma region TABS
+    #pragma region Config(TAB)
     /// CONFIG TAB
 
     // Constants
@@ -56,8 +56,7 @@ namespace Extensions::D3D9::Menu {
           // Special bool handling
           static auto _enabled = _newLoadingScreensConfig["Enabled"].GetBool();
 
-          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::GetStyle().WindowPadding.x * 2.0f -
-                          ImGui::GetStyle().FramePadding.x / 2.0f);
+          ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - ImGui::GetStyle().WindowPadding.x * 2.0f - ImGui::GetStyle().FramePadding.x / 2.0f);
           if (ImGui::Checkbox("###NewLoadingScreensEnabledCheckbox", &_enabled)) {
             _newLoadingScreensConfig["Enabled"].SetBool(_enabled);
             Config::Get().Save();
@@ -73,8 +72,11 @@ namespace Extensions::D3D9::Menu {
 
           ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - 100.0f);
           ImGui::WithItemWidth _w(100.0f);
-          ImGui::InputScalar("###NewLoadingScreensBackgroundTimer", ImGuiDataType_Float,
-                             reinterpret_cast<float*>(&_newLoadingScreensConfig["BackgroundTimer"]), nullptr, nullptr,
+          ImGui::InputScalar("###NewLoadingScreensBackgroundTimer",
+                             ImGuiDataType_Double,
+                             reinterpret_cast<double*>(&_newLoadingScreensConfig["BackgroundTimer"]),
+                             nullptr,
+                             nullptr,
                              "%.2f");
           if (ImGui::IsItemDeactivatedAfterEdit()) Config::Get().Save();
         }
@@ -122,8 +124,8 @@ namespace Extensions::D3D9::Menu {
 
       ImGui::EndChild();
     }
-#pragma endregion
-#pragma region About(TAB)
+    #pragma endregion
+    #pragma region About(TAB)
     /// ABOUT TAB
 
     // Constants
@@ -142,8 +144,7 @@ namespace Extensions::D3D9::Menu {
       {
         ImGui::TextUnformatted("Stay up to date with the latest version from ");
         ImGui::SameLine(0.0f, 0.0f);
-        if (ImGui::SmallButton("GitHub"))
-          ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkGitHubRelease, nullptr, nullptr, SW_SHOW);
+        if (ImGui::SmallButton("GitHub")) ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkGitHubRelease, nullptr, nullptr, SW_SHOW);
         ImGui::SameLine(0.0f, 0.0f);
         ImGui::TextUnformatted(".");
       }
@@ -153,11 +154,10 @@ namespace Extensions::D3D9::Menu {
         ImGui::Separator();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 30.0f);
         ImGui::TextUnformatted(
-            "Making and maintaining a mod like this requires a lot of\n"
-            "time and energy. If you enjoyed this mod, please consider donating!");
+          "Making and maintaining a mod like this requires a lot of\n"
+          "time and energy. If you enjoyed this mod, please consider donating!");
         ImGui::PopTextWrapPos();
-        if (ImGui::SmallButton("PayPal"))
-          ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkPayPal, nullptr, nullptr, SW_SHOW);
+        if (ImGui::SmallButton("PayPal")) ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkPayPal, nullptr, nullptr, SW_SHOW);
         // ImGui::SameLine();
         // if (ImGui::SmallButton("Paysafecard"))
         //   ShellExecuteA(nullptr, nullptr, details::ABOUT_szLinkPaysafecard, nullptr, nullptr, SW_SHOW);
@@ -178,8 +178,8 @@ namespace Extensions::D3D9::Menu {
         ImGui::Unindent();
       }
     }
-#pragma endregion
-#pragma endregion
+    #pragma endregion
+    #pragma endregion
   } // namespace details
 
   // Called when user has Configuration tab active

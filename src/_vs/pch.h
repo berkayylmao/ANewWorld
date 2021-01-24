@@ -63,6 +63,7 @@ using namespace std::chrono_literals;
 
 // Most used helpers
 #include "Helpers/Config.hpp"
+#include "Helpers/IOPaths.hpp"
 #include "Helpers/Logger.hpp"
 #include "Helpers/Random.hpp"
 

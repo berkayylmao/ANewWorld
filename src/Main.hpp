@@ -15,12 +15,12 @@
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see <https://www.gnu.org/licenses/>.
-// 
+//
 // clang-format on
 
 #pragma once
 #include "pch.h"
-
+// D3D9 extension base
 #include "Extensions/D3D9.Base.hpp"
 
 namespace ANewWorld {
@@ -41,7 +41,7 @@ namespace ANewWorld {
       localtime_s(&_tm, &_time);
       _ss << std::put_time(&_tm, "Log [%d-%m-%Y %H.%M.%S].log");
 
-      const auto& _logFilesPath = Config::Get().GetConfigFolderPath() / "Logs";
+      const auto& _logFilesPath = IOPaths::Directories::GetLogsDir();
       std::filesystem::create_directories(_logFilesPath);
       Logger::details::logFilePath = _logFilesPath / _ss.str();
     }

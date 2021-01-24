@@ -21,9 +21,7 @@
 #pragma once
 #pragma warning(push, 0)
 #include <fstream>
-#include <filesystem>
-#include <libloaderapi.h>  // GetModuleFileName
-#include <WinUser.h>       // MessageBox
+#include <WinUser.h> // MessageBox
 
 // rapidJSON
 #include <inc/rapidjson/document.h>
@@ -32,66 +30,56 @@
 #include <inc/rapidjson/ostreamwrapper.h>
 #pragma warning(pop)
 
+// Paths
+#include "Helpers/IOPaths.hpp"
+
 class Config {
-  // File paths
-
-  constexpr static char CONSTANT_pathConfigFileName[] = "Config.json";
-  constexpr static char CONSTANT_pathConfigFolder[]   = "ANewWorld";
-
-protected:
-  std::filesystem::path mConfigFolderPath;
-  std::filesystem::path mConfigFilePath;
+  static constexpr char CONST_defConfigJson[] =
+    R"({"ConfigFileVersion":"1.0","IsFirstTimeUser":true,"NewLoadingScreens":{"Enabled":true,"BackgroundTimer":5.0,"LoadingTextResolution":"Custom"}})";
 
   rapidjson::Document mConfigDocument;
 
-public:
-  [[nodiscard]] auto GetConfigFolderPath() const -> const auto& { return mConfigFolderPath; }
-
+  public:
   void Save() const {
     try {
-      std::filesystem::create_directories(mConfigFolderPath);
+      std::filesystem::create_directories(IOPaths::Directories::GetDataDir());
       {
-        std::ofstream                                      _ofs(mConfigFilePath, std::ios_base::binary);
+        std::ofstream                                      _ofs(IOPaths::Files::GetConfigJsonPath(), std::ios_base::binary);
         rapidjson::OStreamWrapper                          _osw(_ofs);
         rapidjson::PrettyWriter<rapidjson::OStreamWrapper> _writer(_osw);
         _writer.SetIndent(' ', 3);
         mConfigDocument.Accept(_writer);
       }
-    } catch (const std::runtime_error& e) {
-      ::MessageBoxA(nullptr, e.what(), "Error saving config!", MB_ICONERROR | MB_OK);
     }
+    catch (const std::runtime_error& e) { ::MessageBoxA(nullptr, e.what(), "Error saving config!", MB_ICONERROR | MB_OK); }
   }
 
   auto operator[](const char* const szConfigName) -> rapidjson::Value& { return mConfigDocument[szConfigName]; }
 
-private:
+  private:
   void Load() {
     try {
-      if (!std::filesystem::exists(mConfigFilePath)) {
-        ::MessageBoxA(nullptr, "Config file is missing", "Error loading config!", MB_ICONERROR | MB_OK);
-      } else {
-        std::ifstream             _ifs(mConfigFilePath, std::ios_base::binary);
+      if (!std::filesystem::exists(IOPaths::Files::GetConfigJsonPath())) {
+        mConfigDocument.Parse(CONST_defConfigJson);
+        Save();
+      }
+      else {
+        std::ifstream             _ifs(IOPaths::Files::GetConfigJsonPath(), std::ios_base::binary);
         rapidjson::IStreamWrapper _isw(_ifs);
         mConfigDocument.ParseStream(_isw);
+
+        // TODO: check for 'ConfigFileVersion'
       }
-    } catch (const std::runtime_error& e) {
-      ::MessageBoxA(nullptr, e.what(), "Error loading config!", MB_ICONERROR | MB_OK);
     }
+    catch (const std::runtime_error& e) { ::MessageBoxA(nullptr, e.what(), "Error loading config!", MB_ICONERROR | MB_OK); }
   }
 
-  explicit Config() {
-    std::wstring _strPath(2048, 0);
-    ::GetModuleFileNameW(nullptr, &_strPath[0], _strPath.capacity());
-    const std::filesystem::path _path(_strPath.c_str());
+  explicit Config() { Load(); }
 
-    mConfigFolderPath = _path.parent_path() / CONSTANT_pathConfigFolder;
-    mConfigFilePath   = mConfigFolderPath / CONSTANT_pathConfigFileName;
-    Load();
-  }
-
-public:
+  public:
   static auto Get() -> Config& {
-    static Config _instance;
+    static Config _instance{};
+
     return _instance;
   }
 };

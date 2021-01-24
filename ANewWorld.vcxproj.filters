@@ -112,6 +112,9 @@
     <ClInclude Include="src\Extensions\NewLoadingScreens\NewLoadingScreens.hpp">
       <Filter>Extensions\NewLoadingScreens</Filter>
     </ClInclude>
+    <ClInclude Include="src\Helpers\IOPaths.hpp">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Helpers\Dear ImGui\imgui.cpp">

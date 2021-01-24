@@ -139,6 +139,7 @@
     <ClInclude Include="src\Helpers\fmt\format.h" />
     <ClInclude Include="src\Helpers\fmt\ostream.h" />
     <ClInclude Include="src\Helpers\fmt\printf.h" />
+    <ClInclude Include="src\Helpers\IOPaths.hpp" />
     <ClInclude Include="src\Helpers\Logger.hpp" />
     <ClInclude Include="src\Helpers\Random.hpp" />
     <ClInclude Include="src\Main.hpp" />
